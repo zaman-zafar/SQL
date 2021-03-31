@@ -1,69 +1,75 @@
-/****** Script for SelectTopNRows command from SSMS  ******/
-SELECT  t1.[ASSETID]
-      ,[LOWVALUEPOOLTYPE_AU]
-      ,[TXT]
-      ,[TRANSDATE]
-      ,[TRANSTYPE]
-	,t6.ENUMITEMLABEL	
-      ,[VOUCHER]
-      ,[AMOUNTCUR]
-      ,t1.[CURRENCYCODE]
-      ,[AMOUNTMST]
-      ,t1.[LVPTRANSFERID_AU]
-      ,t1.[POSTINGPROFILE]
-      ,t1.[ASSETGROUP]
-      ,t1.[BOOKID]
-      ,[CONSUMPTIONQTY]
-      ,[REVALUATIONDONE]
-      ,[REVALUATIONTRANS]
-      ,[REVALUATIONAMOUNT]
-      ,[REVALUEDTRANSID]
-      ,[RESERVETRANSFERDONE]
-      ,[RESERVETRANSID]
-      ,[RECLASSIFICATION]
-      ,[REASONREFRECID]
-      ,t1.[DEFAULTDIMENSION]
-      ,[APPROVER]
-      ,[ISPRIORYEAR]
-      ,[DOCUMENTNUM_W]
-      ,[DOCUMENTDATE_W]
-      ,[CASHDISCBASEAMOUNTMST]
-      ,[CASHDISCBASETRANSID]
-      ,t1.[MODIFIEDDATETIME]
-      ,t1.[DATAAREAID]
-      ,t1.[RECVERSION]
-      ,t1.[PARTITION]
-      ,t1.[RECID]
-	  ,t2.ASSETGROUP
-	  ,t2.NAME
-	  ,t3.PURCHID
-	  ,t4.Students
-	,t3.VENDACCOUNT
-	,t5.DEPRECIATION
-	,t5.LIFETIME
-	,t5.DEPRECIATIONSTARTDATE
-	,t5.LASTDEPRECIATIONDATE
-	,t5.ACQUISITIONPRICE
-	,t5.ACQUISITIONDATE
-	
-  FROM [MITAX_live].[dbo].[ASSETTRANS] as t1 left join ASSETTABLE as t2 on t1.ASSETID = t2.ASSETID and t1.DATAAREAID = t2.DATAAREAID
-
-  left join PURCHLINE as t3 on  t2.PURCHLINERECID = t3.RECID and t2.DATAAREAID = t3.DATAAREAID
-
-   left join (Select distinct ST2.DIMENSIONATTRIBUTEVALUESET, 
-    substring(
-        (
-            Select '-'+ST1.DISPLAYVALUE  AS [text()]
-            From DIMENSIONATTRIBUTEVALUESETITEM ST1
-            Where ST1.DIMENSIONATTRIBUTEVALUESET = ST2.DIMENSIONATTRIBUTEVALUESET
-            ORDER BY ST1.DIMENSIONATTRIBUTEVALUESET
-            For XML PATH ('')
-        ), 2, 1000) [Students]
-From DIMENSIONATTRIBUTEVALUESETITEM ST2  ) as t4 on t1.DEFAULTDIMENSION = t4.DIMENSIONATTRIBUTEVALUESET
-
-left join ASSETBOOK as t5 on t1.BOOKID = t5.BOOKID and t1.ASSETID = t5.ASSETID and t1.DATAAREAID = t5.DATAAREAID
-
-left join SRSANALYSISENUMS as t6 on t1.TRANSTYPE = t6.ENUMITEMVALUE and t6.ENUMNAME = 'AssetTransType'
-
-  
-  where t1.DATAAREAID = 'required company'
+/****** Script for SelectTopNRows command from SSMS  ******/ 
+SELECT t1.[assetid], 
+       [lowvaluepooltype_au], 
+       [txt], 
+       [transdate], 
+       [transtype], 
+       t6.enumitemlabel, 
+       [voucher], 
+       [amountcur], 
+       t1.[currencycode], 
+       [amountmst], 
+       t1.[lvptransferid_au], 
+       t1.[postingprofile], 
+       t1.[assetgroup], 
+       t1.[bookid], 
+       [consumptionqty], 
+       [revaluationdone], 
+       [revaluationtrans], 
+       [revaluationamount], 
+       [revaluedtransid], 
+       [reservetransferdone], 
+       [reservetransid], 
+       [reclassification], 
+       [reasonrefrecid], 
+       t1.[defaultdimension], 
+       [approver], 
+       [isprioryear], 
+       [documentnum_w], 
+       [documentdate_w], 
+       [cashdiscbaseamountmst], 
+       [cashdiscbasetransid], 
+       t1.[modifieddatetime], 
+       t1.[dataareaid], 
+       t1.[recversion], 
+       t1.[partition], 
+       t1.[recid], 
+       t2.assetgroup, 
+       t2.NAME, 
+       t3.purchid, 
+       t4.students, 
+       t3.vendaccount, 
+       t5.depreciation, 
+       t5.lifetime, 
+       t5.depreciationstartdate, 
+       t5.lastdepreciationdate, 
+       t5.acquisitionprice, 
+       t5.acquisitiondate 
+FROM   [MITAX_live].[dbo].[assettrans] AS t1 
+       LEFT JOIN assettable AS t2 
+              ON t1.assetid = t2.assetid 
+                 AND t1.dataareaid = t2.dataareaid 
+       LEFT JOIN purchline AS t3 
+              ON t2.purchlinerecid = t3.recid 
+                 AND t2.dataareaid = t3.dataareaid 
+       LEFT JOIN (SELECT DISTINCT ST2.dimensionattributevalueset, 
+                                  Substring( 
+                                  (SELECT '-' + ST1.displayvalue AS 
+                                          [text()] 
+                                   FROM 
+                                  dimensionattributevaluesetitem ST1 
+                                             WHERE 
+                                  ST1.dimensionattributevalueset = 
+ST2.dimensionattributevalueset 
+ORDER  BY ST1.dimensionattributevalueset 
+FOR xml path ('')), 2, 1000) [Students] 
+FROM   dimensionattributevaluesetitem ST2) AS t4 
+ON t1.defaultdimension = t4.dimensionattributevalueset 
+LEFT JOIN assetbook AS t5 
+ON t1.bookid = t5.bookid 
+AND t1.assetid = t5.assetid 
+AND t1.dataareaid = t5.dataareaid 
+LEFT JOIN srsanalysisenums AS t6 
+ON t1.transtype = t6.enumitemvalue 
+AND t6.enumname = 'AssetTransType' 
+WHERE  t1.dataareaid = 'required company' 
