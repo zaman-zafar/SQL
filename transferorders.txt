@@ -1,0 +1,56 @@
+/****** Script for SelectTopNRows command from SSMS  ******/ 
+SELECT t3.[accountingdate], 
+       t3.[ledgerentryjournal], 
+       t7.reportingcurrencyamount, 
+       Substring(t7.ledgeraccount, 8, 4) AS receivable, 
+       Substring(t2.ledgeraccount, 8, 4) AS payable, 
+       t3.[acknowledgementdate], 
+       t3.[ledgerpostingjournal], 
+       t3.[fiscalcalendarperiod], 
+       t3.[postinglayer], 
+       t3.[ledger], 
+       t3.[ledgerpostingjournaldataareaid], 
+       t3.[journalnumber], 
+       t3.[transferid], 
+       t3.[budgetsourceledgerentryposted], 
+       t3.[fiscalcalendaryear], 
+       t3.[subledgervoucher], 
+       t3.[subledgervoucherdataareaid], 
+       t3.[documentdate], 
+       t3.[documentnumber], 
+       t3.[journalcategory], 
+       t3.[createddatetime], 
+       t3.[createdby], 
+       t3.[createdtransactionid], 
+       t3.[recversion], 
+       t3.[partition], 
+       t3.[recid] 
+FROM   [MITAX_live].[dbo].[generaljournalentry] AS t3 
+       LEFT JOIN(SELECT DISTINCT ledgeraccount, 
+                                 reportingcurrencyamount, 
+                                 generaljournalentry, 
+                                 postingtype, 
+                                 ledgerdimension, 
+                                 recid 
+                 FROM   generaljournalaccountentry) AS t7 
+              ON t3.recid = t7.generaljournalentry 
+                 AND t7.postingtype IN ( '220', '14' ) 
+       LEFT JOIN [generaljournalentry] AS t1 
+              ON t3.subledgervoucherdataareaid = t1.subledgervoucherdataareaid 
+                 AND t3.subledgervoucher = t1.subledgervoucher 
+                 AND t3.journalnumber = t1.journalnumber 
+                 AND t3.ledger = t1.ledger 
+                 AND t3.recid = t1.recid 
+       LEFT JOIN(SELECT DISTINCT ledgeraccount, 
+                                 reportingcurrencyamount, 
+                                 generaljournalentry, 
+                                 postingtype, 
+                                 ledgerdimension, 
+                                 recid 
+                 FROM   generaljournalaccountentry) AS t2 
+              ON t1.recid = t2.generaljournalentry 
+                 AND t2.postingtype IN ( '219', '14' ) 
+                 AND t2.ledgeraccount LIKE '%230100%' 
+WHERE  t3.subledgervoucherdataareaid = 'company name' 
+       AND t3.journalcategory IN ( '36', '4' ) 
+       AND t7.ledgeraccount LIKE '%116100%' 
